@@ -1,0 +1,4 @@
+# SPEC F6 / workspace/README.md: animation.json のみ版管理。実バイト/派生/揮発は無視。
+uploads/
+.captures/
+exports/

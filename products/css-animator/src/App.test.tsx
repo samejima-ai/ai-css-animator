@@ -1,9 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-describe("App (S1 の器)", () => {
-  it("ヘッダ・アップロードボタン・未選択プレースホルダを描画する", () => {
+// モニタは /api/state を読む。テストでは空 state（画像なし）を返す。
+beforeEach(() => {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ project: "current", dsl: null, imageDataUrl: null }),
+    })),
+  );
+});
+
+describe("App（モニタ）", () => {
+  it("ヘッダ・アップロードボタン・未選択プレースホルダ・キャンバスを描画する", () => {
     render(<App />);
     expect(screen.getByText(/css-animator/i)).toBeInTheDocument();
     expect(

@@ -1,0 +1,16 @@
+{
+  "name": "walk",
+  "description": "歩いているような上下の弾み(bob ±10px)＋左右の傾き(sway ±2°)の無限ループ。1枚画用（脚の関節は動かせないため、歩行リズムの近似）。人間承認済みベース（2026-06-09）。",
+  "motion": {
+    "duration_ms": 700,
+    "easing": "ease-in-out",
+    "iteration": "infinite",
+    "keyframes": [
+      { "at": 0, "x": 0, "y": 0, "rotate": -2, "scale": 1, "opacity": 1, "blur": 0 },
+      { "at": 0.25, "y": -10, "rotate": 0 },
+      { "at": 0.5, "y": 0, "rotate": 2 },
+      { "at": 0.75, "y": -10, "rotate": 0 },
+      { "at": 1, "y": 0, "rotate": -2, "scale": 1, "opacity": 1, "blur": 0 }
+    ]
+  }
+}

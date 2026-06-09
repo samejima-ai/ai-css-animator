@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "css-animator dev (Vite)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "products/css-animator", "run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "css-animator preview (Vite build preview)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "products/css-animator", "run", "preview"],
+      "port": 4173
+    }
+  ]
+}

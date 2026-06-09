@@ -7,6 +7,10 @@ colors:
   bg_chrome: "#F7F7F8"    # パネル/ツールバー
   text: "#1F2329"
   border: "#E3E5E8"
+  pass: "#1E8E3E"         # 検証ゲート PASS（機能状態色＝事実。美的評価ではない・F4）
+  fail: "#D93025"         # 検証ゲート FAIL（同上）
+  overlay: "rgba(247,247,248,0.82)"   # 前面フローティングカード（半透明・backdrop blur）
+  overlay_border: "rgba(227,229,232,0.7)"
 typography:
   font_ui: "system-ui, -apple-system, 'Segoe UI', sans-serif"
   font_mono: "ui-monospace, 'SF Mono', Menlo, monospace"  # DSL/数値表示
@@ -29,10 +33,14 @@ layout:
   プレビューキャンバスとアニメだけが視覚的主役になる。
 - 参考: Vite/Storybook 系の質素な開発ツールUI。装飾的アニメーションは chrome 自身には付けない。
 
-## レイアウト原則
+## レイアウト原則（C2 確定後・全面モニタ＋フローティングカード）
 
-- 3領域: ①画像アップロード＋意図テキスト欄（左 or 上） / ②プレビューキャンバス（中央・最大面積） / ③DSL差分・検証結果（右 or 下、`font_mono`）。
-- プレビューキャンバスは `bg_canvas` の中性暗色で、画像の透過・移動・blur が視認しやすいようにする。
+- **ブラウザ＝モニタ**（SPEC F6）。プレビューキャンバスを**全面展開**し、画像（＝編集対象のアニメ）を主役にする。
+- chrome は**前面の半透明フローティングカード**として浮かせる（`overlay` トークン＋backdrop blur）。背景のキャンバスが透けて見え、画像の視認を妨げない。
+  - 左カード: 画像アップロード（文脈ハンドオフ）＋ヒント＋最低限操作（reduced-motion・再生）。
+  - 右カード: レイヤー情報（事実）＋「キャプチャして検証」（5フレーム＋ゲート事実、`font_mono`）。
+- 対話・DSL編集は Claude Code 側（チャット＋ファイル）で行い、ブラウザ内に DSL エディタは置かない。
+- キャンバスは `bg_canvas` の中性暗色で、画像の透過・移動・blur が視認しやすいようにする。
 
 ## Do's
 
