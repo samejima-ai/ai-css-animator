@@ -7,5 +7,11 @@ workspace/**/uploads/
 workspace/**/exports/
 workspace/**/.captures/
 
+# ビルド/依存
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
 # OS/エディタ雑多
 .DS_Store

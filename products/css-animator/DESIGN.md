@@ -10,10 +10,15 @@ colors:
 typography:
   font_ui: "system-ui, -apple-system, 'Segoe UI', sans-serif"
   font_mono: "ui-monospace, 'SF Mono', Menlo, monospace"  # DSL/数値表示
+  size_sm: 12             # px・補助テキスト/ヒント
+  size_base: 13           # px・本文
+  size_md: 14             # px・操作要素
 spacing:
   unit: 8                 # 8px グリッド
 radius:
   base: 8
+layout:
+  panel_width: 264        # px・左右パネル幅
 ---
 
 # DESIGN — css-animator
