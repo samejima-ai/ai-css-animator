@@ -1,0 +1,18 @@
+{
+  "layers": [
+    {
+      "target": "layer_1",
+      "src": "uploads/________.png",
+      "duration_ms": 700,
+      "easing": "ease-in-out",
+      "iteration": "infinite",
+      "keyframes": [
+        { "at": 0, "x": 0, "y": 0, "rotate": -2, "scale": 1, "opacity": 1, "blur": 0 },
+        { "at": 0.25, "y": -10, "rotate": 0 },
+        { "at": 0.5, "y": 0, "rotate": 2 },
+        { "at": 0.75, "y": -10, "rotate": 0 },
+        { "at": 1, "y": 0, "rotate": -2, "scale": 1, "opacity": 1, "blur": 0 }
+      ]
+    }
+  ]
+}

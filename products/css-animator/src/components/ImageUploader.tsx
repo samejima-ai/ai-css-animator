@@ -1,15 +1,15 @@
 import { useRef } from "react";
 import { validateUpload } from "../lib/upload";
-import type { PreviewLayer } from "../state/layer";
 
 interface Props {
-  onLayer: (layer: PreviewLayer) => void;
+  /** 選んだ画像を (fileName, dataUrl) で渡す。投入先（workspace 保存）は親が担う＝文脈ハンドオフ。 */
+  onPick: (fileName: string, dataUrl: string) => void;
   onError: (message: string) => void;
 }
 
-let layerSeq = 0;
-
-export function ImageUploader({ onLayer, onError }: Props) {
+// 画像はチャットでなくプレビューペインから投入する＝「これをアニメする対象」という
+// 文脈ごと AI に渡す（SPEC F6）。ここは検証＋data URL 化のみ。保存は /api/upload（親）。
+export function ImageUploader({ onPick, onError }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -21,13 +21,11 @@ export function ImageUploader({ onLayer, onError }: Props) {
       e.target.value = "";
       return;
     }
-    const objectUrl = URL.createObjectURL(result.file);
-    onLayer({
-      target: `layer_${++layerSeq}`,
-      fileName: result.file.name,
-      objectUrl,
-    });
-    // 同じファイルを選び直しても change が発火するようにリセット
+    const file = result.file;
+    const reader = new FileReader();
+    reader.onload = () => onPick(file.name, String(reader.result));
+    reader.onerror = () => onError("画像の読み込みに失敗しました");
+    reader.readAsDataURL(file);
     e.target.value = "";
   }
 

@@ -13,40 +13,71 @@ body {
   background: var(--color-bg-chrome);
 }
 
+/* 全面展開＝モニタ。chrome は前面の半透明フローティングカードで浮かせる。 */
 .app {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   height: 100%;
+  overflow: hidden;
+  background: var(--color-bg-canvas);
 }
-.app__header {
-  padding: calc(var(--space-unit) * 1.5) calc(var(--space-unit) * 2);
-  background: var(--color-bg-chrome);
-  border-bottom: 1px solid var(--color-border);
+
+.hud--title {
+  position: absolute;
+  top: calc(var(--space-unit) * 2);
+  left: calc(var(--space-unit) * 2.5);
+  z-index: 2;
+  color: var(--color-bg-chrome);
   font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
-.app__phase {
+
+/* カードの表示/非表示トグル（常時前面・最小の chrome） */
+.hud-toggle {
+  position: absolute;
+  top: calc(var(--space-unit) * 2);
+  right: calc(var(--space-unit) * 2.5);
+  z-index: 3;
+  padding: calc(var(--space-unit) * 0.5) var(--space-unit);
+  background: var(--color-overlay);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-overlay-border);
+  border-radius: var(--radius-base);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.24);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+.hud__sub {
   font-family: var(--font-mono);
   font-weight: 400;
-  opacity: 0.55;
+  opacity: 0.7;
   margin-left: var(--space-unit);
 }
 
-.app__body {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-}
-.panel {
-  width: var(--panel-width);
+.card {
+  position: absolute;
+  z-index: 2;
   padding: calc(var(--space-unit) * 2);
-  background: var(--color-bg-chrome);
+  background: var(--color-overlay);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-overlay-border);
+  border-radius: calc(var(--radius-base) * 1.5);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  width: calc(var(--panel-width) * 1.1);
+  max-height: calc(100% - var(--space-unit) * 8);
   overflow: auto;
 }
-.panel--left {
-  border-right: 1px solid var(--color-border);
+.card--input {
+  top: calc(var(--space-unit) * 6);
+  left: calc(var(--space-unit) * 2.5);
 }
-.panel--right {
-  border-left: 1px solid var(--color-border);
+.card--info {
+  top: calc(var(--space-unit) * 6);
+  right: calc(var(--space-unit) * 2.5);
 }
 .panel__title {
   font-size: var(--font-size-base);
@@ -70,23 +101,19 @@ body {
   margin: var(--space-unit) 0 0;
 }
 
-.intent {
-  display: block;
+.hint {
   margin-top: calc(var(--space-unit) * 2);
-}
-.intent__label {
-  font-size: var(--font-size-sm);
-  opacity: 0.7;
-}
-.intent__input {
-  width: 100%;
-  margin-top: calc(var(--space-unit) * 0.5);
-  font-family: var(--font-ui);
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-base);
-  padding: var(--space-unit);
-  resize: vertical;
+  line-height: 1.6;
+  opacity: 0.75;
+}
+.hint code {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-canvas);
+  color: var(--color-bg-chrome);
+  padding: 0 calc(var(--space-unit) * 0.5);
+  border-radius: calc(var(--radius-base) * 0.5);
 }
 
 .error {
@@ -96,21 +123,18 @@ body {
   margin-top: var(--space-unit);
 }
 
-.canvas-wrap {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-}
 .canvas {
-  flex: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   background: var(--color-bg-canvas);
 }
 .canvas__img {
-  max-width: 90%;
-  max-height: 90%;
+  max-width: 80%;
+  max-height: 80%;
   object-fit: contain;
 }
 .canvas__placeholder {
@@ -133,4 +157,176 @@ body {
 }
 .facts--empty {
   opacity: 0.5;
+}
+
+/* 右パネルは DSL エディタ＋検証結果を収めるため広めにする（DESIGN ③: DSL差分・検証結果） */
+.panel--right {
+  width: calc(var(--panel-width) * 1.4);
+}
+
+/* プレビュー: stage 内のレイヤー wrapper を WAAPI で動かす（contain で隔離・DONT §3.3） */
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.stage__layer {
+  contain: layout paint;
+  display: inline-block;
+  line-height: 0;
+}
+
+/* プレビュー操作（装飾アニメは付けない・DESIGN Don'ts） */
+.controls {
+  margin-top: calc(var(--space-unit) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-unit);
+}
+.controls__row {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-unit) * 0.75);
+  font-size: var(--font-size-base);
+}
+.controls__replay {
+  align-self: flex-start;
+  padding: calc(var(--space-unit) * 0.5) var(--space-unit);
+  background: var(--color-bg-chrome);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+}
+.controls__replay:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* DSL エディタ（AIが触る世界・font_mono） */
+.dsl {
+  margin-top: calc(var(--space-unit) * 2);
+}
+.dsl__label {
+  display: block;
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  margin-bottom: calc(var(--space-unit) * 0.5);
+}
+.dsl__input {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  padding: var(--space-unit);
+  resize: vertical;
+  white-space: pre;
+  overflow: auto;
+}
+.dsl__status {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  margin: calc(var(--space-unit) * 0.5) 0 0;
+  word-break: break-word;
+}
+.dsl__status--ok {
+  color: var(--color-pass);
+}
+.dsl__status--fail {
+  color: var(--color-fail);
+}
+
+/* 検証ゲート結果（事実のみ・font_mono・SPEC F4） */
+.verify {
+  margin-top: calc(var(--space-unit) * 2.5);
+}
+.verify__btn {
+  width: 100%;
+  padding: var(--space-unit) calc(var(--space-unit) * 1.5);
+  background: var(--color-primary);
+  color: var(--color-bg-chrome);
+  border: none;
+  border-radius: var(--radius-base);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+}
+.verify__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.verify__error {
+  color: var(--color-fail);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-unit);
+  word-break: break-word;
+}
+.verify__results {
+  margin-top: var(--space-unit);
+}
+.verify__summary {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  margin: 0 0 var(--space-unit);
+}
+.gates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.gate {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: calc(var(--space-unit) * 0.75);
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  padding: calc(var(--space-unit) * 0.5) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.gate__tag {
+  font-weight: 700;
+}
+.gate--pass .gate__tag {
+  color: var(--color-pass);
+}
+.gate--fail .gate__tag {
+  color: var(--color-fail);
+}
+.gate__name {
+  opacity: 0.85;
+}
+.gate__detail {
+  opacity: 0.7;
+  word-break: break-word;
+}
+.frames {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-unit);
+  margin-top: calc(var(--space-unit) * 1.5);
+}
+.frame {
+  margin: 0;
+  text-align: center;
+}
+.frame__img {
+  width: calc(var(--space-unit) * 12);
+  height: calc(var(--space-unit) * 9);
+  object-fit: contain;
+  background: var(--color-bg-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-base) * 0.5);
+}
+.frame__cap {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+  margin-top: calc(var(--space-unit) * 0.25);
 }

@@ -9,7 +9,7 @@
 | **モード** | **M2（標準モード）** | L0 → L1 + layer1-independent-reviewer |
 | **dev_mode** | **github_assisted** | GitHub○・M2・LC≤1。autonomous不採用（下記） |
 | **ARC** | **monolith** | 単一Viteアプリ・単一デプロイ単位 |
-| **persona** | default | REGIME新規・`persona.active` 未指定 |
+| **persona** | sheep-navigator | 人間指示で固定（2026-06-09）。`persona.active` 明示指定 |
 | **AI能力バージョン** | Claude Opus 4 世代（2026-06 時点） | L2発動閾値はこの能力に依存 |
 | **LC** | 0（新規） | 振り返り儀式スキップ |
 
@@ -47,3 +47,15 @@ SPEC<15k tok / files<80 / 行<10k / domains=1 / 並行=1 / 1サイクル<2h。
 ## サブフェーズ
 
 [spec/subphase-manifest.md](./spec/subphase-manifest.md) 参照。L0-2（ドメインモデル）のみ起動。
+
+## persona（v5.17.0 規約）
+
+- active: sheep-navigator        # templates/personas/sheep-navigator.persona.md
+- override_state: null           # 自動遷移（Normal / Overflow / Attention）
+
+## 相互作用レイヤ（C2 確定・2026-06-09）
+
+- 対話レイヤ = Claude Code スキル `/css-animator`（専用アプリUIに作り込まない）。
+- 人間の連続視認 = Claude Code プレビューペイン（dev サーバ）＝ブラウザはモニタ。
+- 編集 = AI が `workspace/<project>/animation.json` を差分パッチ。人間は数値非接触。
+- 詳細は SPEC.md「F6. 相互作用モデル」/ DONT.md §1。

@@ -8,6 +8,10 @@
   --color-bg-chrome: #f7f7f8;
   --color-text: #1f2329;
   --color-border: #e3e5e8;
+  --color-pass: #1e8e3e;
+  --color-fail: #d93025;
+  --color-overlay: rgba(247, 247, 248, 0.82);
+  --color-overlay-border: rgba(227, 229, 232, 0.7);
 
   --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
