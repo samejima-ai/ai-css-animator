@@ -1,0 +1,22 @@
+/*
+ * DESIGN.md の YAML トークン → CSS 変数ブリッジ。
+ * HEX リテラル・px 基準値はこのファイルに閉じる（src/ 内の他所では var(...) を参照）。
+ */
+:root {
+  --color-primary: #1a73e8;
+  --color-bg-canvas: #1e1e1e;
+  --color-bg-chrome: #f7f7f8;
+  --color-text: #1f2329;
+  --color-border: #e3e5e8;
+
+  --font-ui: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+
+  --space-unit: 8px;
+  --radius-base: 8px;
+
+  --panel-width: 264px;
+}

@@ -1,0 +1,17 @@
+# css-animator runtime workspace
+# 方針: animation.json（DSL）だけを版管理し、それ以外の実データは追跡しない。
+# （SPEC.md「ファイル配置とライフサイクル」/ DONT.md §1 参照）
+
+# 元画像（入力ラスタ）・焼き込み成果（派生物）・検証フレーム（揮発）
+workspace/**/uploads/
+workspace/**/exports/
+workspace/**/.captures/
+
+# ビルド/依存
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# OS/エディタ雑多
+.DS_Store
