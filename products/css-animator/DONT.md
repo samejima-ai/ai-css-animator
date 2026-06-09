@@ -41,6 +41,7 @@
 | グローバルCSS変数（`:root`）の毎フレーム更新＝**継承爆弾** | CSS変数を使わずWAAPI keyframesを直記述。ツリー全体のスタイル再計算を構造的に回避 |
 | SVG属性（`d / cx / cy / r`）の直接アニメ | 対象は画像ラスタ＋`transform`のみ。SVG属性アニメは射程外 |
 | `will-change` の一律静的付与によるVRAM枯渇 | WAAPIが合成を管理。`will-change`を手動静的付与しない（付ける場合のみ動的解放） |
+| `src` の `../` パストラバーサル（想定外パス解決） | `spec/domain.ts` の `SRC_PATTERN` で `uploads/` 配下の画像拡張子に制約、`/` 不許可で構造的に排除 |
 
 ### 3.2 検証ゲートで決定論判定する（[sensors/computational.md](./sensors/computational.md)）
 

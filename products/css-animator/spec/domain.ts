@@ -11,6 +11,12 @@ import { z } from "zod";
 /** プリミティブ上限（DONT.md §3.2 / sensors/computational.md と同期） */
 export const BLUR_MAX_PX = 10; // 半径>10px は非線形コスト＋レイヤー肥大
 
+/**
+ * src は uploads/ 配下の画像（png/jpg/jpeg/webp）のみ。
+ * `/` を許さないため `../` 等のパストラバーサルを構造的に排除する（DONT.md §3.1）。
+ */
+export const SRC_PATTERN = /^uploads\/[\w.-]+\.(png|jpe?g|webp)$/i;
+
 /** cubic-bezier(a,b,c,d) のゆるい形式チェック（4数値） */
 const cubicBezier = z
   .string()
@@ -43,7 +49,7 @@ export const KeyframeSchema = z
 export const LayerSchema = z
   .object({
     target: z.string().min(1), // レイヤーID
-    src: z.string().min(1), // uploads/xxx.png
+    src: z.string().regex(SRC_PATTERN, "src は uploads/ 配下の画像（png/jpg/jpeg/webp）であること"),
     duration_ms: z.number().positive(),
     easing: EasingSchema.default("ease-out"),
     iteration: z.union([z.number().positive(), z.literal("infinite")]).default(1),
