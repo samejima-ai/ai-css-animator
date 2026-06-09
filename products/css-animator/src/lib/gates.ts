@@ -32,7 +32,16 @@ export interface CapturedFrame {
 /** G2: 全 keyframe の blur ≤ BLUR_MAX_PX（DSL 上で決定論判定） */
 export function gateBlurCap(layer: Layer): GateResult {
   for (const k of layer.keyframes) {
-    if (k.blur !== undefined && k.blur > BLUR_MAX_PX) {
+    if (k.blur === undefined) continue;
+    if (!Number.isFinite(k.blur)) {
+      // 非有限値は「上限以前の入力異常」として安全側（FAIL）に倒す。
+      return {
+        gate: "G2 blur-cap",
+        pass: false,
+        detail: `at=${k.at} blur=${k.blur}（非有限値・入力異常）`,
+      };
+    }
+    if (k.blur > BLUR_MAX_PX) {
       return {
         gate: "G2 blur-cap",
         pass: false,
@@ -48,8 +57,28 @@ export function gateOffscreen(
   frames: CapturedFrame[],
   vp: Viewport,
 ): GateResult {
+  if (
+    !Number.isFinite(vp.width) ||
+    !Number.isFinite(vp.height) ||
+    vp.width < 0 ||
+    vp.height < 0
+  ) {
+    return {
+      gate: "G3 offscreen",
+      pass: false,
+      detail: `viewport 異常 [${vp.width}x${vp.height}]（非有限/負・入力異常）`,
+    };
+  }
   for (const f of frames) {
     const { x, y, width, height } = f.bbox;
+    if (![x, y, width, height].every(Number.isFinite) || width < 0 || height < 0) {
+      // 非有限値・負の寸法はキャプチャ異常として FAIL（比較すり抜けによる誤 PASS を防ぐ）。
+      return {
+        gate: "G3 offscreen",
+        pass: false,
+        detail: `at=${f.at} bbox 異常 [${x},${y},${width},${height}]（非有限/負・入力異常）`,
+      };
+    }
     const right = x + width;
     const bottom = y + height;
     if (x < 0 || y < 0 || right > vp.width || bottom > vp.height) {
@@ -78,6 +107,15 @@ export function gateNotStatic(
       gate: "G4 not-static",
       pass: false,
       detail: `フレーム数=${frames.length}（2 未満で比較不可）`,
+    };
+  }
+  // 解像度（pixel 長）不一致は同一条件比較の前提を満たさない＝キャプチャ異常として FAIL。
+  const len = frames[0].pixels.length;
+  if (frames.some((f) => f.pixels.length !== len)) {
+    return {
+      gate: "G4 not-static",
+      pass: false,
+      detail: `フレーム間で pixel 長不一致（解像度不一致・入力異常）`,
     };
   }
   const first = frames[0].pixels;
@@ -121,6 +159,14 @@ export function gateOpacity(
   epsilon = 0.01,
 ): GateResult {
   for (const m of measured) {
+    if (!Number.isFinite(m.opacity)) {
+      // 非有限の測定値は透明バグ判定以前の入力異常として FAIL。
+      return {
+        gate: "G6 opacity",
+        pass: false,
+        detail: `at=${m.at} 実測 opacity=${m.opacity}（非有限値・入力異常）`,
+      };
+    }
     const expected = sampleAt(layer, m.at).opacity;
     if (expected > epsilon && m.opacity <= epsilon) {
       return {

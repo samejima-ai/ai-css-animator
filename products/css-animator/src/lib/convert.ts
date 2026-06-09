@@ -57,12 +57,16 @@ interface Point {
   v: number;
 }
 
-/** keyframes から primitive p が明示された (at, value) 列を昇順抽出 */
+/**
+ * keyframes から primitive p が明示された (at, value) 列を昇順抽出。
+ * 同一 at の重複は「後勝ち」で決定論的に潰す（0 長セグメント＝0除算 NaN を防ぐ）。
+ */
 function points(keyframes: Keyframe[], p: Prim): Point[] {
-  return keyframes
-    .filter((k) => k[p] !== undefined)
-    .map((k) => ({ at: k.at, v: k[p] as number }))
-    .sort((a, b) => a.at - b.at);
+  const byAt = new Map<number, number>();
+  for (const k of keyframes) {
+    if (k[p] !== undefined) byAt.set(k.at, k[p] as number);
+  }
+  return Array.from(byAt, ([at, v]) => ({ at, v })).sort((a, b) => a.at - b.at);
 }
 
 /** primitive の時刻 t における値を線形補間（端は clamp、未定義は default 定数） */
@@ -74,6 +78,7 @@ function valueAt(pts: Point[], t: number, def: number): number {
   for (let i = 0; i < pts.length - 1; i++) {
     const a = pts[i];
     const b = pts[i + 1];
+    if (b.at === a.at) continue; // 0 長セグメント防御（points で除去済みだが念のため）
     if (t >= a.at && t <= b.at) {
       const f = (t - a.at) / (b.at - a.at);
       return a.v + (b.v - a.v) * f;

@@ -91,4 +91,19 @@ describe("sampleAt", () => {
     expect(sampleAt(l, 0.5).opacity).toBe(1);
     expect(sampleAt(l, 0.5).scale).toBe(1);
   });
+
+  it("同一 at の重複でも NaN を出さず後勝ちで決定論的に解決", () => {
+    // 同じ y を at:0 に重複指定（後勝ち=-5）。0除算 NaN が出ないこと。
+    const l = layer({
+      keyframes: [
+        { at: 0, y: 0 },
+        { at: 0, y: -5 },
+        { at: 1, y: 10 },
+      ],
+    });
+    const s = sampleAt(l, 0);
+    expect(Number.isNaN(s.y)).toBe(false);
+    expect(s.y).toBe(-5);
+    expect(Number.isNaN(sampleAt(l, 0.5).y)).toBe(false);
+  });
 });

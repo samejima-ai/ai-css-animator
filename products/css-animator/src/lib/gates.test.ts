@@ -32,6 +32,13 @@ describe("gateBlurCap (G2)", () => {
     expect(r.pass).toBe(false);
     expect(r.detail).toContain("12px");
   });
+  it("blur が非有限値(NaN)は入力異常として FAIL（fail-closed）", () => {
+    const r = gateBlurCap(
+      layer({ keyframes: [{ at: 0, blur: 0 }, { at: 1, blur: NaN }] }),
+    );
+    expect(r.pass).toBe(false);
+    expect(r.detail).toContain("入力異常");
+  });
 });
 
 describe("gateOffscreen (G3)", () => {
@@ -50,6 +57,21 @@ describe("gateOffscreen (G3)", () => {
     expect(r.pass).toBe(false);
     expect(r.detail).toContain("at=1");
   });
+  it("bbox に NaN が含まれると入力異常として FAIL（fail-closed）", () => {
+    const r = gateOffscreen(
+      [{ at: 0, bbox: { x: NaN, y: 0, width: 100, height: 100 } }],
+      vp,
+    );
+    expect(r.pass).toBe(false);
+    expect(r.detail).toContain("入力異常");
+  });
+  it("負の幅は入力異常として FAIL", () => {
+    const r = gateOffscreen(
+      [{ at: 0, bbox: { x: 0, y: 0, width: -10, height: 100 } }],
+      vp,
+    );
+    expect(r.pass).toBe(false);
+  });
 });
 
 describe("gateNotStatic (G4)", () => {
@@ -67,6 +89,14 @@ describe("gateNotStatic (G4)", () => {
     ]);
     expect(r.pass).toBe(true);
   });
+  it("pixel 長不一致（解像度不一致）は入力異常として FAIL（fail-closed）", () => {
+    const r = gateNotStatic([
+      { at: 0, pixels: new Uint8Array([1, 2, 3, 4]) },
+      { at: 1, pixels: new Uint8Array([1, 2, 3]) },
+    ]);
+    expect(r.pass).toBe(false);
+    expect(r.detail).toContain("不一致");
+  });
 });
 
 describe("gateDuration (G5)", () => {
@@ -82,5 +112,10 @@ describe("gateOpacity (G6)", () => {
   });
   it("期待通り不透明は PASS", () => {
     expect(gateOpacity(l, [{ at: 0.5, opacity: 1 }]).pass).toBe(true);
+  });
+  it("実測 opacity が非有限値(NaN)は入力異常として FAIL（fail-closed）", () => {
+    const r = gateOpacity(l, [{ at: 0.5, opacity: NaN }]);
+    expect(r.pass).toBe(false);
+    expect(r.detail).toContain("入力異常");
   });
 });
