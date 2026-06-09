@@ -114,6 +114,40 @@ interface PerceptionAdapter {
 
 ---
 
+## ファイル配置とライフサイクル（F6・確定）
+
+ワークベンチは連続/断続的に多数のアニメを作る。ファイルは4種類でライフサイクルが異なり、
+**「DSL＝生きたsource／export＝焼き込んだ葉」** の原則で扱う（HANDOFF §5 のファイル配置版）。
+
+### レイアウト（project/library モデル）
+
+```
+products/css-animator/
+├─ （ハーネス本体: SPEC/DONT/spec/sensors/… = 版管理する）
+└─ workspace/
+    ├─ <project-id>/
+    │   ├─ uploads/        元画像（入力・.gitignore）
+    │   ├─ animation.json  DSL（生きたsource・★版管理する唯一の実データ）
+    │   ├─ .captures/      検証フレーム（揮発・.gitignore）
+    │   └─ exports/        焼き込み成果（派生・.gitignore）
+    └─ _done/<project-id>/  export済みの退避先（DSL凍結）
+```
+
+- `uploads/` `exports/` `.captures/` はアプリが起動時/必要時に生成する（git追跡しないため clone 後は不在）。
+- `project-id` は人間可読の識別子（命名規約の標準化は C2 で詰める）。
+
+### 版管理方針（決定）
+
+**`animation.json`（DSL）だけを git 追跡する。** `uploads / exports / .captures` は `.gitignore`。
+理由: DSLが唯一の真実源かつ将来の seed pool 候補。画像バイナリはリポを肥大させ、export はDSLから再生成可能な派生物。
+
+### 完了ファイルの扱い（決定）
+
+export 済み project は `workspace/_done/<project-id>/` へ退避し **DSLを凍結扱い**にする。
+微調整は export を触らず（焼き込み＝再編集不可）、**DSLを複製して新 project として再開**する（履歴を壊さない）。
+※ 過去DSLを発案の種に再利用する「履歴の seed pool 化」の代謝プロトコルは **C2＝意図的未確定**（DONT.md §1）。
+今は物理配置のみ確定し、作法は1往復後に L0 で詰める。
+
 ## UX制約
 
 - Must閾値: DSL差分→描画反映は **HMRで体感即時**（p95 < 1s 目安）。決定論キャプチャ5フレームは **< 5s**。
